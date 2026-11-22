@@ -24,12 +24,25 @@
 </style>
 </head>
 <body>
-<!-- Halaman khusus pelanggan Monfre Studio. Hanya membuka nota digital (?nota=KODE), tidak ada halaman login tim. -->
+<!-- Halaman khusus pelanggan Monfre Studio. Hanya membuka nota digital (?nota=KODE) dan progres pesanan (?progres=KODE), tidak ada halaman login tim. -->
 <div class="tengah" id="layar"><div><img src="logo-nota.png" alt="Monfre Studio"><p id="msg">Memuat nota digital...</p></div></div>
 <iframe id="app" title="Nota digital" allow="clipboard-write"></iframe>
 <script>
+  // alamat Web App aplikasi booking (akun Monfre)
+  var BOOKING = 'https://script.google.com/macros/s/AKfycbxC2ceRvpNY3gXBVPpgs1u2AxVbqhFxDaYmj7hUXCN5hUBCey72M09JgqpLsu3c7NuIcA/exec';
   (function () {
-    var m = /[?&]nota=([a-f0-9]{12,40})(?:&|$)/.exec(location.search || ''), layar = document.getElementById('layar');
+    var q = location.search || '', m = /[?&]nota=([a-f0-9]{12,40})(?:&|$)/.exec(q), layar = document.getElementById('layar');
+    // link progres pesanan dari nota / WA: ?progres=KODE&k=KUNCI -> aplikasi booking langsung menampilkan progres
+    var pr = /[?&]progres=([A-Za-z0-9-]{3,40})(?:&|$)/.exec(q), kk = /[?&]k=([a-f0-9]{8,16})(?:&|$)/i.exec(q);
+    if (pr) {
+      document.title = 'Progres Pesanan Monfre Studio';
+      document.getElementById('msg').textContent = 'Memuat progres pesanan...';
+      var fp = document.getElementById('app');
+      fp.title = 'Progres pesanan';
+      fp.onload = function () { layar.style.display = 'none'; fp.style.display = 'block'; };
+      fp.src = BOOKING + '?page=cek&kode=' + encodeURIComponent(pr[1]) + (kk ? '&k=' + kk[1].toLowerCase() : '');
+      return;
+    }
     if (!m) {
       layar.innerHTML = '<div><img src="logo-nota.png" alt="Monfre Studio"><p>Nota digital Monfre Studio</p>' +
         '<p>Buka link nota yang kami kirim lewat WhatsApp untuk melihat nota Anda.</p><a href="https://www.monfrestudio.com">Kunjungi www.monfrestudio.com</a></div>';
