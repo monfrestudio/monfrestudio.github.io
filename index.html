@@ -24,7 +24,7 @@
 </style>
 </head>
 <body>
-<!-- Halaman khusus pelanggan Monfre Studio. Hanya membuka nota digital (?nota=KODE) dan progres pesanan (?progres=KODE), tidak ada halaman login tim. -->
+<!-- Halaman khusus pelanggan Monfre Studio. Hanya membuka nota digital (?nota=KODE), progres pesanan (?progres=KODE), dan galeri pilih foto (?galeri=KODE), tidak ada halaman login tim. -->
 <div class="tengah" id="layar"><div><img src="logo-nota.png" alt="Monfre Studio"><p id="msg">Memuat nota digital...</p></div></div>
 <iframe id="app" title="Nota digital" allow="clipboard-write"></iframe>
 <script>
@@ -34,6 +34,17 @@
     var q = location.search || '', m = /[?&]nota=([a-f0-9]{12,40})(?:&|$)/.exec(q), layar = document.getElementById('layar');
     // link progres pesanan dari nota / WA: ?progres=KODE&k=KUNCI -> aplikasi booking langsung menampilkan progres
     var pr = /[?&]progres=([A-Za-z0-9-]{3,40})(?:&|$)/.exec(q), kk = /[?&]k=([a-f0-9]{8,16})(?:&|$)/i.exec(q);
+    // galeri pilih foto: ?galeri=KODE&k=KUNCI -> aplikasi booking menampilkan foto untuk dipilih pelanggan
+    var gl = /[?&]galeri=([A-Za-z0-9-]{3,40})(?:&|$)/.exec(q);
+    if (gl && kk) {
+      document.title = 'Galeri Pilih Foto Monfre Studio';
+      document.getElementById('msg').textContent = 'Memuat galeri foto...';
+      var fg = document.getElementById('app');
+      fg.title = 'Galeri pilih foto';
+      fg.onload = function () { layar.style.display = 'none'; fg.style.display = 'block'; };
+      fg.src = BOOKING + '?page=galeri&kode=' + encodeURIComponent(gl[1]) + '&g=' + kk[1].toLowerCase();
+      return;
+    }
     if (pr) {
       document.title = 'Progres Pesanan Monfre Studio';
       document.getElementById('msg').textContent = 'Memuat progres pesanan...';
